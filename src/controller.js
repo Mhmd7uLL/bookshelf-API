@@ -60,7 +60,28 @@ export const saveBook = (req, res) => {
 };
 
 export const showAllBooks = (req, res) => {
-    const result = books.map((book) => ({
+    const { name, reading, finished } = req.query;
+    let filteredBooks = books;
+
+    if (name) {
+        filteredBooks = filteredBooks.filter((book) =>
+            book.name.toLowerCase().includes(name.toLowerCase())
+        );
+    }
+
+    if (reading) {
+        filteredBooks = filteredBooks.filter(
+            (book) => book.reading === (reading === '1')
+        );
+    }
+
+    if (finished) {
+        filteredBooks = filteredBooks.filter(
+            (book) => book.finished === (finished === '1')
+        );
+    }
+    
+    const bookData = filteredBooks.map((book) => ({
         id: book.id,
         name: book.name,
         publisher: book.publisher
@@ -75,7 +96,7 @@ export const showAllBooks = (req, res) => {
 
     return res.status(200).json({
         status: 'success',
-        data: { books: result }
+        data: { books: bookData }
     })
 };
 
@@ -94,7 +115,7 @@ export const showDetailBookByID = (req, res) => {
         status:'fail',
         message: 'Buku tidak ditemukan'
     })
-}
+};
 
 export const changeBookDataByID = (req, res) => {
     const { id } = req.params;
@@ -133,7 +154,7 @@ export const changeBookDataByID = (req, res) => {
     }
 
     const updatedAt = new Date().toISOString();
-    const finised = readPage === pageCount;
+    const finished = readPage === pageCount;
 
     books[bookIndex] = { ...books[bookIndex], name, year, author, summary, publisher, pageCount, readPage, reading};
     return res.status(200).json({
@@ -141,7 +162,7 @@ export const changeBookDataByID = (req, res) => {
         message: 'Buku berhasil diperbarui'
     })
 
-} 
+}; 
 
 export const deleteBookByID = (req, res) => {
     const { id } = req.params;
@@ -159,4 +180,4 @@ export const deleteBookByID = (req, res) => {
             message: 'Buku gagal dihapus. Id tidak ditemukan'
         })
     }
-}
+};
